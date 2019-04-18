@@ -6,7 +6,7 @@
 
 因为项目需要和诸多运行在工厂车间的老系统做对接，但个人却比较熟悉用Python做研发工具。一开始用了一个比较笨拙的方法：基于socket通信将Python程序通过Pyinstaller工具打包为一个server.exe，然后挂到生产系统中，在客户端通过json做请求参数并调用。
 
-无意中看到博文：[《用keras训练模型并用Tensorflow的C++API调用模型》](<https://blog.csdn.net/qq_25109263/article/details/81285952>)**引用1**，作者给出了很好的解决方案：keras训练 -> *.h5 -> 转化为*.pb -> 利用TF(C++)API调用，个人实践了一番亲测可用，但最近的项目更多是语义分割相关的，故选用UNet实践了一遍记录到此文中。
+无意中看到博文：[《用keras训练模型并用Tensorflow的C++API调用模型》](<https://blog.csdn.net/qq_25109263/article/details/81285952>)，作者给出了很好的解决方案：keras训练 -> *.h5 -> 转化为*.pb -> 利用TF(C++)API调用，个人实践了一番亲测可用，但最近的项目更多是语义分割相关的，故选用UNet并主要结合原博主代码再次实践了一遍后记录到此文中。
 
 ## 2. 环境
 
@@ -148,7 +148,7 @@ plt.show()
 
 ![](./imgs/hdf5_vs_pb.png)
 
-## VC++工程
+## 5. VC++工程
 
 考虑到生产过程中算法这块儿主要通过dll交付，通过定义对应的接口类并在类的构造函数中完成模型参数的加载以及提供计算调用接口是较通用的方式（总不能计算一次就加载一次模型），整个头文件设计如下：
 
@@ -363,3 +363,7 @@ int main(int aargc, char** argv)
 最后可以在X64/Release目录中将所需tensorflow.dll和data拷贝过去，可见其正常工作。
 
 ![](./imgs/result.png)
+
+## 6. 附注
+
+所有代码已放置个人github：<https://github.com/atlantistin/Blogs>
