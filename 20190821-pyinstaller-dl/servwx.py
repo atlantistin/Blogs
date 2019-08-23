@@ -74,6 +74,7 @@ class MyFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self)
         MyTaskBarIcon()  # 显示系统托盘图标
+        # 服务线程
         threading_server = threading.Thread(target=server.serve_forever)
         threading_server.start()            
 
@@ -96,6 +97,7 @@ if __name__ == "__main__":
     IP, PORT = "127.0.0.1", 8888
     print("服务器地址%s:%s." % (IP, PORT))
     server = socketserver.ThreadingTCPServer((IP, PORT), Handler)
+    # 托盘图标
     app = MyApp()
     app.MainLoop()
     
