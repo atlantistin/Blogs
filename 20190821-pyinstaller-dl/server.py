@@ -24,8 +24,9 @@ class Handler(socketserver.BaseRequestHandler):
                 imgpath = self.request.recv(1024).decode().strip()
                 try:  # 捕获错误路径输入
                     input_X = np.expand_dims(np.array(Image.open(imgpath).resize((299, 299))), axis=0) / 255.0
-                except:
-                    self.request.send("Error!".encode())
+                except Exception as e:
+                    message = "IMGPathError: " + str(e)
+                    self.request.send(message.encode())
                     continue
                 ys = model.predict(input_X)
                 top_3 = [(classes[str(i)], ys.flatten()[i]) for i in ys.flatten().argsort()[-1:-4:-1]]
@@ -66,6 +67,7 @@ class MyTaskBarIcon(wx.adv.TaskBarIcon):
     # 获取菜单属性
     def getMenuAttrs(self):
         return [('关于', self.ID_ABOUT), ('退出', self.ID_EXIT)]
+     
      
 # Frame
 class MyFrame(wx.Frame):
