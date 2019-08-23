@@ -41,9 +41,6 @@ class MySystemTrayIcon(QSystemTrayIcon):
         super(MySystemTrayIcon, self).__init__(parent, icon=QIcon("./data/taiji.ico"))
         self.show()
         self.popup_menu()
-        # 服务线程
-        threading_server = threading.Thread(target=server.serve_forever)
-        threading_server.start()  
     
     def popup_menu(self):
         # 创建菜单
@@ -77,6 +74,8 @@ if __name__ == "__main__":
     IP, PORT = "127.0.0.1", 8888
     print("服务器地址%s:%s." % (IP, PORT))
     server = socketserver.ThreadingTCPServer((IP, PORT), Handler)
+    threading_server = threading.Thread(target=server.serve_forever)
+    threading_server.start()  
     # 托盘图标
     app = QApplication(sys.argv)
     QApplication.setQuitOnLastWindowClosed(False)
