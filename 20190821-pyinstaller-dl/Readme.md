@@ -187,11 +187,7 @@ if __name__ == "__main__":
 
 ### 5. 演示
 
-<<<<<<< HEAD
 ![](.\data\server.png)
-=======
-.\data\server.png
->>>>>>> 69fdc7027864a9eda5e66ed3907e73519910be1d
 
 可以看到当运行启动server.py后会在托盘处显示我们预定义好的图标。
 
