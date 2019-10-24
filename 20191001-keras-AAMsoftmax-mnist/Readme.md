@@ -14,11 +14,30 @@
 
 最左边的就是最原始的基于Softmax训练后抽取到的特征进行三维可视化的结果，这样的特征除了能用于分类之外毫无用处。想象一下如果同一个类别经过前面特征提取器的输出都能尽可能地是同一个特征向量该有多好，就像一个人无论年轻还是老去，素颜还是化妆，但都只有一个唯一标识的身份证号。即便达不到这样的要求，那能尽可能地接近也行啊，这样通过相似度就能比较了！这就是上图中靠右的方法结果。但是实际应用过程中训练时的类别太少了可能还不行，如果有几万、几十万甚至上百万的类别统统给这样训练一下，每个类别都被表达地非常紧凑，那岂不相当于拥有了针对此类数据集的完美编码器呢？所以传统的分类器某种程度上只完成了一小部分，而识别则再此基础上迈出了更远的一步：最大化类间距离，最小化类内距离。
 
-在这方面的探索比较成功的有两类方法如下。
+在这方面的探索比较成功的有两类方法如下：
+
+### 1.1 Metric Learning [度量学习]
+* **Contrastive Loss**, 2014-01-18, Deep learning face representation by joint identification-verification.
+* **Triplet Loss**, 2015-03-12, Facenet: A unified embedding for face recognition and clustering. 
+    * 2015-09-10, O. M. Parkhi, A. Vedaldi, and A. Zisserman. Deep face recognition. 
+* **Margin Based Loss**, 2017-06-23, Sampling matters in deep embedding learning.
+* **Soft-Margin Loss**, 2017-11-21, In defense of the triplet loss for person re-identification.
+
+
+### 1.2. Margin Based Classification [基于分类的边界最大化]
+* **Centor Loss**, 2016-09-16, A discriminative feature learning approach for deep face recognition.
+* **L-Softmax**, 2016-12-07, Large-margin softmax loss for convolutional neural networks.
+* **Sphereface / A-Softmax**, 2017-04-26, Sphereface: Deep hypersphere embedding for face recognition.
+* **Normface**, 2017-04-21, NormFace: L2 Hypersphere Embedding for Face Verification
+* **AM-softmax**, 2018-01-17, Additive Margin Softmax for Face Verification
+* **CosFace**, 2018-01-29, CosFace: Large Margin Cosine Loss for Deep Face Recognition
+* **ArcFace / AAM-Softmax**, 2018-01-23, ArcFace: Additive Angular Margin Loss for Deep Face Recognition
+
+但度量学习既有组合爆炸等的问题又非常难以学习，所以基于最大化间隔的分类器自然成了当前的主流，其演化流程大致如下（可能有纰漏，还请指正），相比传统的图像分类只需要替换末尾的softmax改成自定义层，训练过程无需任何变化，但训练的结果却可以用来处理识别问题，岂不美哉！
 
 
 
-但度量学习既有组合爆炸等的问题又非常难以学习，所以基于最大化间隔的分类器自然成了当前的主流，相比传统的图像分类只需要替换末尾的softmax改成自定义层，训练过程无需任何变化，但训练的结果却可以用来处理识别问题，岂不美哉！
+![change](./imgs/change.png)
 
 ## 2. 利用Keras自定义层并搭建简单的序列模型
 
@@ -120,7 +139,7 @@ if __name__ == "__main__":
 
 ```
 
-首先说一下在Keras中的自定义层，无非就是要继承并重写 build、call、compute_output_shape 这三个方法。众所周知，深度学习模型的基本单位一定是“层”，所以 build 方法就是这个层中定义权重的地方，并指定哪些参数可训练哪些不需要之类。其次是 call 方法，用于实现改成的计算逻辑，说白了就是结合权重等怎么把输入变化到输出的过程。最后还有个 compute_output_shape 的方法，很简单，就是为了能显示打印输入输出张量的 shape 。
+首先说一下在Keras中的自定义层，无非就是要继承并重写 build、call、compute_output_shape 这三个方法。众所周知，深度学习模型的基本单位一定是“层”，所以 build 方法就是这个层中定义权重的地方，并指定哪些参数可训练哪些不需要之类。其次是 call 方法，用于实现改成的计算逻辑，说白了就是结合权重等怎么把输入变化到输出的过程。最后还有个 compute_output_shape 的方法，很简单，就是为了能显式打印输入输出张量的 shape 。
 
 为了对比说明 CosFace 和 ArcFace，在上面的 call 方法中进行了对比，如果需要使用 CosFace 就注释掉下面关于 phi 的计算逻辑而改用上面的即可。
 
